@@ -37,6 +37,7 @@ from pytorch_lightning.utilities.imports import (  # noqa: F401
     _OMEGACONF_AVAILABLE,
     _RPC_AVAILABLE,
     _TORCH_GREATER_EQUAL_1_6_0,
+    _TORCH_PRUNE_AVAILABLE,
     _TORCHTEXT_AVAILABLE,
     _TORCHVISION_AVAILABLE,
     _XLA_AVAILABLE,
