@@ -13,7 +13,6 @@
 # limitations under the License.
 """General utilities"""
 import platform
-import operator
 from distutils.version import LooseVersion
 from importlib.util import find_spec
 
@@ -40,22 +39,21 @@ def _module_available(module_path: str) -> bool:
         return False
 
 
-def _compare_version(package: str, op, version) -> bool:
-    if find_spec(package):
-        pkg_version = LooseVersion(pkg_resources.get_distribution(package).version)
-        return op(pkg_version, LooseVersion(version))
-    return False
+def _get_version(package: str) -> LooseVersion:
+    return LooseVersion(pkg_resources.get_distribution(package).version)
 
 
 _IS_WINDOWS = platform.system() == "Windows"
 
-_TORCH_LOWER_EQUAL_1_4 = _compare_version('torch', operator.lt, "1.5.0")
-_TORCH_GREATER_EQUAL_1_6 = _compare_version('torch', operator.ge, "1.6.0")
+_TORCH_LOWER_EQUAL_1_4 = _get_version("torch") < LooseVersion("1.5.0")
+_TORCH_GREATER_EQUAL_1_6 = _get_version("torch") >= LooseVersion("1.6.0")
 _TORCH_QUANTIZE_AVAILABLE = _module_available('torch.ops.quantized')
 _APEX_AVAILABLE = _module_available("apex.amp")
 _BOLTS_AVAILABLE = _module_available('pl_bolts')
 _FAIRSCALE_AVAILABLE = not _IS_WINDOWS and _module_available('fairscale.nn.data_parallel')
-_FAIRSCALE_PIPE_AVAILABLE = _TORCH_GREATER_EQUAL_1_6 and _compare_version('fairscale', operator.le, "0.1.3")
+_FAIRSCALE_PIPE_AVAILABLE = (
+    _TORCH_GREATER_EQUAL_1_6 and _FAIRSCALE_AVAILABLE and _get_version('fairscale') < LooseVersion("0.1.3")
+)
 _GROUP_AVAILABLE = not _IS_WINDOWS and _module_available('torch.distributed.group')
 _HOROVOD_AVAILABLE = _module_available("horovod.torch")
 _HYDRA_AVAILABLE = _module_available("hydra")
